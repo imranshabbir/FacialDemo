@@ -267,7 +267,7 @@ function App() {
     
     if (response.ok && response.status == 200) {
       let resposeJson = await response.json();
-      EfrSDK.getInstance.executeFeedback({
+      window.EfrSDK.getInstance.executeFeedback({
         data: resposeJson.data,
         on_result: function (result) {
           resultCallback(result);
