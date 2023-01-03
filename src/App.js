@@ -19,6 +19,7 @@ import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 import FilePondPluginFileEncode from 'filepond-plugin-file-encode';
+import { ContactSupportOutlined } from "@mui/icons-material";
 
 // Register the plugins
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileEncode)
@@ -35,6 +36,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 function App() {
   const [livenessToken, setLivenessToken] = useState("")
+  const [livenessConfig, setLivenessConfig] = useState("")
 
   const [livenessData, setLivenessData] = useState("")
   const [livenessDataHash, setLivenessDataHash] = useState("")
@@ -111,7 +113,7 @@ function App() {
 
   //const [livenessCheckLoading, setLivenessCheckLoading] = useState(false)
   
-  let rhservAuthToken = "";
+  //let rhservAuthToken = "";
   let config = "";
   let livenessChekList = [
     // "SMILE",
@@ -122,7 +124,7 @@ function App() {
     // "ZOOM_IN",
     //"RAISE_HEAD_UP",
   ];
-
+  
   let baseUrl = `https://etisalatssms.server.aicenter.ae/`;
   let credentials = {
     username: "dev.etisalat@tdra.ae",
@@ -214,8 +216,7 @@ function App() {
         window && window.EfrSDK.getInstance.setLivenessChecks(livenessChekList);
         window && window.EfrSDK.getInstance.setLocale(langIdentifiers);
         window && window.EfrSDK.getInstance.setTimeout(30);
-        // document.getElementById("initialize-face-capture").style.display =
-        //   "block";
+        //document.getElementById("initialize-face-capture").style.display = "block";
         console.log(
           window && window.EfrSDK.getInstance.getVersion(),
           window && window.EfrSDK.getInstance.getExpiryDate()
@@ -255,7 +256,7 @@ function App() {
   const feedBackHandler = async (feedBack) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "text/plain");
-    myHeaders.append("Authorization", "Bearer " + rhservAuthToken);
+    myHeaders.append("Authorization", "Bearer " + livenessToken);
     var requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -263,17 +264,43 @@ function App() {
       redirect: "follow",
     };
     let response = await fetch(baseUrl + "sdk/liveness", requestOptions);
-
-    if (response.ok && response.status === 200) {
+    
+    if (response.ok && response.status == 200) {
       let resposeJson = await response.json();
-      window && window.EfrSDK.getInstance.executeFeedback({
+      EfrSDK.getInstance.executeFeedback({
         data: resposeJson.data,
-        on_result: function (result) {              
+        on_result: function (result) {
           resultCallback(result);
         },
       });
     }
   };
+
+  // const feedBackHandler = async (feedBack) => {
+  //   console.log(feedBack)
+  //   var myHeaders = new Headers();
+  //   myHeaders.append("Content-Type", "text/plain");
+  //   myHeaders.append("Authorization", "Bearer " + rhservAuthToken);
+  //   var requestOptions = {
+  //     method: "POST",
+  //     headers: myHeaders,
+  //     body: feedBack,
+  //     redirect: "follow",
+  //   };
+  //   let response = await fetch(baseUrl + "sdk/liveness", requestOptions);
+  //   console.log("feedback handler called")
+  //   console.log(response)
+  //   if (response.ok && response.status == 200) {
+  //     console.log("feedback handler called1")
+  //     let resposeJson = await response.json();
+  //     window && window.EfrSDK.getInstance.executeFeedback({
+  //       data: resposeJson.data,
+  //       on_result: function (result) {              
+  //         resultCallback(result);
+  //       },
+  //     });
+  //   }
+  // };
   
   const rhservrLogin = async () => {
     try {
@@ -293,13 +320,13 @@ function App() {
         baseUrl + "auth/access/login",
         requestOptions
       );
-
+      
       if (result.status === 200) {
         result.json().then((data) => {
-          if (data.succeeded === true) {
-            rhservAuthToken = data.data.token;
+          if (data.succeeded == true) {
+            //rhservAuthToken = data.data.token;
             setLivenessToken(data.data.token)
-            getPureliveConfig();
+            getPureliveConfig(data.data.token);
           } else {
             alert("RHServ Api : " + data.errors[0]);
           }
@@ -339,7 +366,9 @@ function App() {
   };
 
   async function resultCallback(finalResult) {
-    if (finalResult.status === false) {
+    console.log("finalResult")
+    console.log(finalResult)
+    if (finalResult.status == false) {
       setLivenessErrors(finalResult.errors[0].code + " - " + finalResult.errors[0].message)
       return;
     }
@@ -352,10 +381,10 @@ function App() {
     }
   }
 
-  const getPureliveConfig = async () => {
+  const getPureliveConfig = async (token) => {
     try {
       var myHeaders = new Headers();
-      myHeaders.append("Authorization", "Bearer " + rhservAuthToken);
+      myHeaders.append("Authorization", "Bearer " + token);
       var requestOptions = {
         method: "GET",
         headers: myHeaders,
@@ -365,12 +394,13 @@ function App() {
         baseUrl + "sdk/configuration",
         requestOptions
       );
-
+      
       if (result.status === 200) {
         await result.json().then((resultConfig) => {
           if (resultConfig) {
             config = resultConfig.data;
-            setSecretKey(rhservAuthToken);
+            setLivenessConfig(resultConfig.data)
+            setSecretKey(token);
           }
         });
       }
