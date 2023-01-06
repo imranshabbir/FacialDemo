@@ -413,8 +413,8 @@ function App() {
 
     console.log(response)
     if (response.status === 200) {
-      response.json().then((data) => {
-        //console.log(data)
+      response.json().then((data) => {        
+        setSubscriptionData({ ...subscriptionData , subscriberId : data.subscriberId, intermediaryTransactionId: data.intermediaryTransactionId })
       })
     }
     else
@@ -849,13 +849,13 @@ function App() {
         </Grid>
         <Grid xs={5}>
           <Item style={{width:'100%'}}>
-              <TextField label="Subscriber Id" defaultValue={"-9223372036854765742"} style={{width:'100%'}} 
-                onChange = { e => setSubscriptionData({ ...subscriptionData , subscriberId : e.target.value}) }                
+              <TextField  disabled label="Subscriber Id" defaultValue={"-9223372036854765742"} style={{width:'100%'}} 
+                //onChange = { e => setSubscriptionData({ ...subscriptionData , subscriberId : e.target.value}) }                
               />
           </Item> 
           <Item style={{width:'100%'}}>
-              <TextField label="Intermediary Transaction Id" defaultValue={"{{intermediaryTransactionId}}"} style={{width:'100%'}} 
-                onChange = { e => setSubscriptionData({ ...subscriptionData , intermediaryTransactionId : e.target.value}) }                
+              <TextField disabled label="Intermediary Transaction Id" defaultValue={"{{intermediaryTransactionId}}"} style={{width:'100%'}} 
+                //onChange = { e => setSubscriptionData({ ...subscriptionData , intermediaryTransactionId : e.target.value}) }                
               />
           </Item> 
           <Item style={{width:'100%'}}>
@@ -951,7 +951,7 @@ function App() {
           <Item style={{width:'100%'}}>
               <TextField label="Services" defaultValue={"-2147483642,-2147483641"} style={{width:'100%'}} 
                 onChange = { e => { 
-                  setSubscriptionData({ ...serviceData ,  
+                  setServiceData({ ...serviceData ,  
                     intermediaryTransactionId : subscriptionData.intermediaryTransactionId,
                     subscriptionServices:  
                       [...serviceData.subscriptionServices].map(obj =>{
