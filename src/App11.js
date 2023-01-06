@@ -6,12 +6,22 @@ import SendIcon from '@mui/icons-material/Send';
 import Grid from '@mui/material/Unstable_Grid2';
 import Paper from '@mui/material/Paper';
 import Box, { BoxProps } from '@mui/material/Box';
-import Button from '@mui/material/Button';
 
 import { styled } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+
+//import imageToBase64  from "image-to-base64";
+//const imageToBase64 = require('image-to-base64');
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import PropTypes from 'prop-types';
+
+// Import React FilePond
 import { FilePond, File, registerPlugin } from 'react-filepond'
 // Import FilePond styles
 import 'filepond/dist/filepond.min.css'
@@ -26,6 +36,38 @@ import { VolunteerActivismOutlined } from "@mui/icons-material";
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileEncode)
 //FilePond.registerPlugin(FilePondPluginFileEncode);
 
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
   
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -36,10 +78,6 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function App() {
-  const [url, setUrl] = useState("https://etisalatssms.server.aicenter.ae/")
-  const [user, setUser] = useState("dev.etisalat@tdra.ae")
-  const [password, setPassword] = useState("")
-
   const [livenessToken, setLivenessToken] = useState("")
   const [livenessConfig, setLivenessConfig] = useState("")
 
@@ -130,7 +168,11 @@ function App() {
     //"RAISE_HEAD_UP",
   ];
   
-  
+  let baseUrl = `https://etisalatssms.server.aicenter.ae/`;
+  let credentials = {
+    username: "dev.etisalat@tdra.ae",
+    password: "L5Wq@V3ns",
+  };
   let langIdentifiers = {
     record_button: "Record",
     result_close_button: "Close",
@@ -238,8 +280,8 @@ function App() {
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       var raw = JSON.stringify({
-        email: user,
-        password: password,
+        email: credentials.username,
+        password: credentials.password,
       });
       var requestOptions = {
         method: "POST",
@@ -248,7 +290,7 @@ function App() {
         redirect: "follow",
       };
       let result = await fetch(
-        url + "auth/access/login",
+        baseUrl + "auth/access/login",
         requestOptions
       );
       
@@ -282,7 +324,7 @@ function App() {
         redirect: "follow",
       };
       let result = await fetch(
-        url + "rhapi/Mgmt/GetTemporaryKey",
+        baseUrl + "rhapi/Mgmt/GetTemporaryKey",
         requestOptions
       );
 
@@ -306,7 +348,7 @@ function App() {
       body: feedBack,
       redirect: "follow",
     };
-    let response = await fetch(url + "sdk/liveness", requestOptions);
+    let response = await fetch(baseUrl + "sdk/liveness", requestOptions);
     
     if (response.ok && response.status == 200) {
       let resposeJson = await response.json();
@@ -348,7 +390,7 @@ function App() {
         redirect: "follow",
       };
       let result = await fetch(
-        url + "sdk/configuration",
+        baseUrl + "sdk/configuration",
         requestOptions
       );
       
@@ -409,7 +451,7 @@ function App() {
       redirect: "follow",
     };
 
-    let response = await fetch(url + "api/v1/Subscriber/FaceOnboarding", requestOptions);
+    let response = await fetch(baseUrl + "api/v1/Subscriber/FaceOnboarding", requestOptions);
 
     console.log(response)
     if (response.status === 200) {
@@ -437,7 +479,7 @@ function App() {
       redirect: "follow",
     };
 
-    let response = await fetch(url + "api/v1/Subscription/Add", requestOptions);
+    let response = await fetch(baseUrl + "api/v1/Subscription/Add", requestOptions);
 
     console.log(response)
     if (response.status === 200) {
@@ -465,7 +507,7 @@ function App() {
       redirect: "follow",
     };
 
-    let response = await fetch(url + "api/v1/Subscription/AssignServices", requestOptions);
+    let response = await fetch(baseUrl + "api/v1/Subscription/AssignServices", requestOptions);
 
     console.log(response)
     if (response.status === 200) {
@@ -482,9 +524,9 @@ function App() {
   };
 
 
-  // React.useEffect(()=>{
-  //   rhservrLogin();
-  // },[]) 
+  React.useEffect(()=>{
+    rhservrLogin();
+  },[]) 
 
   React.useEffect(()=>{
     setPassportData({ ...passportData ,  
@@ -549,40 +591,26 @@ function App() {
   //   }
   // ];
 
+  
+  const [tabVal, setTabVal] = React.useState(0);
 
+  const handleChange = (event, newValue) => {
+    setTabVal(newValue);
+  };
+  
   return (
     <Box sx={{ width: '100%', margin:'3%'}}>
       <div className="loader" id="loader"></div>
       <div id="image-crop-container"></div>
       <p />
+      <Tabs value={tabVal} onChange={handleChange} aria-label="basic tabs example">
+          <Tab label="Item One" {...a11yProps(0)}  />
+          {/* <Tab label="Item Two" {...a11yProps(1)} />
+          <Tab label="Item Three" {...a11yProps(2)} /> */}
+      </Tabs>
+
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-        <Grid Item xs={11}>          
-          <Item style={{width:'100%'}}>            
-            <Stack direction="row" spacing={2}>
-              <TextField disabled label="User" defaultValue={user} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
-              onChange = { e => setUser(e.target.value) }   />
-              <TextField label="Password" defaultValue={password} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
-              onChange = { e => setPassword(e.target.value) } />
-            </Stack>
-          </Item>
-          <Item style={{width:'100%'}}>            
-            <Stack direction="row" spacing={2}>
-              <TextField disabled label="URL" defaultValue={url} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
-                onChange = { e => setUrl(e.target.value) }
-              />
-              <LoadingButton
-              style={{backgroundColor:'#e10000'}}
-              //style={{backgroundColor:'#ff0000'}}
-              onClick={rhservrLogin}
-              endIcon={<SendIcon />}
-              loadingPosition="end"
-              variant="contained"          
-              >
-                Login
-              </LoadingButton>
-            </Stack>
-          </Item>
-        </Grid>
+      {/* <TabPanel value={tabVal} index={0}> */}
         <Grid Item xs={5}>          
           <Item>          
             <LoadingButton
@@ -603,13 +631,14 @@ function App() {
           </Item>
           <Item>
             <Stack direction="row" spacing={2}>
-              <TextField disabled label="Liveness Data Hash" defaultValue={livenessDataHash} style={{width:'100%'}} multiline rows="2" />
+              <TextField disabled label="Liveness Data Hash" defaultValue={livenessDataHash} style={{width:'100%'}} multiline rows="2" InputLabelProps={{ shrink: true }} />
             </Stack>
           </Item>
           <Item>
             <TextField disabled label="Liveness Data" defaultValue={livenessData} style={{width:'100%'}}  multiline rows="6" InputLabelProps={{ shrink: true }} />
           </Item>
         </Grid>    
+        {/* </TabPanel> */}
         <Grid xs={6}>
           <Item style={{width:'100%'}}>            
             <Stack direction="row" spacing={2}>
