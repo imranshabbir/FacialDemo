@@ -19,7 +19,8 @@ import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 import FilePondPluginFileEncode from 'filepond-plugin-file-encode';
-import { ContactSupportOutlined } from "@mui/icons-material";
+import { VolunteerActivismOutlined } from "@mui/icons-material";
+//import { ContactSupportOutlined } from "@mui/icons-material";
 
 // Register the plugins
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview, FilePondPluginFileEncode)
@@ -43,7 +44,7 @@ function App() {
   const [livenessStatus, setLivenessStatus] = useState(false)
   const [livenessThumbnail, setLivenessThumbnail] = useState()
   const [livenessErrors, setLivenessErrors] = useState("")
-  
+    
   const [files, setFiles] = useState([]) 
   
   const [passportData,setPassportData] = useState({
@@ -57,13 +58,13 @@ function App() {
          issuingAuthority :"ARE",
          documentNumber :"P123456",
          registrantNumber :"",
-         documentIssueDate :"2012-04-15",
+         DocumentIssueDate :"2012-04-15",
          expiryDate :"2031-10-13",
          primaryIdentifier :"GEORGE",
          secondaryIdentifier :"FEDERICK",
          birthDate :"1974-08-12",
          gender :"M",
-         documentNationality :"ARE",
+         DocumentNationality :"ARE",
          mrz :{            
                line1 :"P<AREABDULLAH<<AHMAD<MOHAMAD<<<<<<<<<<<<<<<<",
                line2 :"L898902C36ARE7408122F1204159ZE184226B<<<<<10",
@@ -73,14 +74,14 @@ function App() {
         secondPageScan :"",
         nfcPortrait :"",
         nfcSignature :"",
-        croppedPortrait :"",
+        CroppedPortrait :"",
       } ,    
     ],
     face:[
         {
-          data: "",
-          dataHash: "",
-          tag: "SHA256"          
+          Data: "",
+          DataHash: "",
+          Tag: null
         }
     ]
   })
@@ -111,8 +112,7 @@ function App() {
     ]
   })
 
-  //const [livenessCheckLoading, setLivenessCheckLoading] = useState(false)
-  
+    
   //let rhservAuthToken = "";
   let config = "";
   let livenessChekList = [
@@ -216,7 +216,6 @@ function App() {
         window && window.EfrSDK.getInstance.setLivenessChecks(livenessChekList);
         window && window.EfrSDK.getInstance.setLocale(langIdentifiers);
         window && window.EfrSDK.getInstance.setTimeout(30);
-        //document.getElementById("initialize-face-capture").style.display = "block";
         console.log(
           window && window.EfrSDK.getInstance.getVersion(),
           window && window.EfrSDK.getInstance.getExpiryDate()
@@ -224,84 +223,15 @@ function App() {
         console.log("===================");
       },
       on_error: function (error) {
-        // var previewContainer = document.createElement("div");
-        // previewContainer.id = "image-preview-container"; // var previewContainer = document.getElementById('image-preview-container');
-
-        // previewContainer.innerHTML = "";
-        // document.querySelector("body").appendChild(previewContainer);
-        // document.getElementById("initialize-face-capture").style.display =
-        //   "none";
-        
-        // var h1 = document.createElement("H1");
-        // var t1 = document.createTextNode("message : " + error.message);
-        // h1.style.cssText =
-        //   "text-align:center;font: 19px / 37px Segoe UI;color:#000;font-weight:bold;margin:0";
-        // h1.appendChild(t1);
         setLivenessErrors(error.code + " - " + error.message)
-
-        // var h2 = document.createElement("H1");
-        // var t2 = document.createTextNode("Code : " + error.code);
-        // h2.style.cssText =
-        //   "text-align:center;font: 19px / 37px Segoe UI;color:#000;font-weight:bold;margin:0";
-        // h2.appendChild(t2);
-
-        // previewContainer.append(h1);
-        // previewContainer.append(h2);
         console.log(error);
       },
     });
   }
 
 
-  const feedBackHandler = async (feedBack) => {
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "text/plain");
-    myHeaders.append("Authorization", "Bearer " + livenessToken);
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: feedBack,
-      redirect: "follow",
-    };
-    let response = await fetch(baseUrl + "sdk/liveness", requestOptions);
-    
-    if (response.ok && response.status == 200) {
-      let resposeJson = await response.json();
-      window.EfrSDK.getInstance.executeFeedback({
-        data: resposeJson.data,
-        on_result: function (result) {
-          resultCallback(result);
-        },
-      });
-    }
-  };
 
-  // const feedBackHandler = async (feedBack) => {
-  //   console.log(feedBack)
-  //   var myHeaders = new Headers();
-  //   myHeaders.append("Content-Type", "text/plain");
-  //   myHeaders.append("Authorization", "Bearer " + rhservAuthToken);
-  //   var requestOptions = {
-  //     method: "POST",
-  //     headers: myHeaders,
-  //     body: feedBack,
-  //     redirect: "follow",
-  //   };
-  //   let response = await fetch(baseUrl + "sdk/liveness", requestOptions);
-  //   console.log("feedback handler called")
-  //   console.log(response)
-  //   if (response.ok && response.status == 200) {
-  //     console.log("feedback handler called1")
-  //     let resposeJson = await response.json();
-  //     window && window.EfrSDK.getInstance.executeFeedback({
-  //       data: resposeJson.data,
-  //       on_result: function (result) {              
-  //         resultCallback(result);
-  //       },
-  //     });
-  //   }
-  // };
-  
+
   const rhservrLogin = async () => {
     try {
       var myHeaders = new Headers();
@@ -365,19 +295,40 @@ function App() {
     }
   };
 
-  async function resultCallback(finalResult) {
-    console.log("finalResult")
-    console.log(finalResult)
+  const feedBackHandler = async (feedBack) => {
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "text/plain");
+    myHeaders.append("Authorization", "Bearer " + livenessToken);
+    var requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: feedBack,
+      redirect: "follow",
+    };
+    let response = await fetch(baseUrl + "sdk/liveness", requestOptions);
+    
+    if (response.ok && response.status == 200) {
+      let resposeJson = await response.json();
+      window.EfrSDK.getInstance.executeFeedback({
+        data: resposeJson.data,
+        on_result: function (result) {
+          resultCallback(result);          
+        },
+      });
+    }
+  };
+
+  function resultCallback(finalResult) {
     if (finalResult.status == false) {
       setLivenessErrors(finalResult.errors[0].code + " - " + finalResult.errors[0].message)
       return;
     }
 
-    if (finalResult.status === true && finalResult.data !== "") {
-      setLivenessStatus(finalResult.status)
+    if (finalResult.status === true && finalResult.data !== "") {      
       setLivenessData(finalResult.data)
+      setLivenessStatus(finalResult.status)
       setLivenessDataHash(finalResult.datahash)
-      setLivenessThumbnail(finalResult.thumbnail)      
+      setLivenessThumbnail(finalResult.thumbnail)
     }
   }
 
@@ -412,24 +363,19 @@ function App() {
   function startProcess() {
     window && window.EfrSDK.getInstance.startProcess({
       on_progress: function () {
-        //setLivenessCheckLoading(true)
         document.getElementById("loader").style.display = "block";
       },
       on_feedback: function (result) {
-        //setLivenessCheckLoading(false)
         feedBackHandler(result);
       },
       on_error: function (error) {
-        //setLivenessCheckLoading(false)
         document.getElementById("loader").style.display = "none";
         console.log(error);
       },
       on_close: function () {
-        //setLivenessCheckLoading(false)
         console.log("on_close========");
       },
       on_timeout: function () {
-        //setLivenessCheckLoading(false)
         console.log("on_timeout========");
       },
     });
@@ -441,12 +387,12 @@ function App() {
     setLivenessDataHash('')
     setLivenessErrors('')
     setLivenessThumbnail('')
-    //if (document.getElementById("image-preview-container"))
-    //  document.getElementById("image-preview-container").remove(); //return;    
+
     startProcess();
   }
 
   const sendPassportData = async () => {
+    console.log("sendPassportData")
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer " + livenessToken);
@@ -456,11 +402,13 @@ function App() {
       body: JSON.stringify(passportData),
       redirect: "follow",
     };
+
     let response = await fetch(baseUrl + "api/v1/Subscriber/FaceOnboarding", requestOptions);
 
+    console.log(response)
     if (response.status === 200) {
       response.json().then((data) => {
-        console.log(data)
+        //console.log(data)
       })
     }
     else
@@ -474,68 +422,39 @@ function App() {
 
   React.useEffect(()=>{
     rhservrLogin();
-  },[])
+  },[]) 
 
   React.useEffect(()=>{
-    console.log(livenessData)
-
     setPassportData({ ...passportData ,  
       subscriberDocuments:  
         [...passportData.subscriberDocuments].map(obj =>{
             return {
               ...obj,
               nfcPortrait : livenessData,
-              croppedPortrait : livenessData,
+              CroppedPortrait : livenessData,
             }
-        })      
-    })    
-
-    setPassportData({ ...passportData ,  
-      face:  
-        [...passportData.face].map(obj =>{
-            return {
-              ...obj,
-              data : livenessData,
-            }
-        })
+        }),  
+        face:  
+          [...passportData.face].map(obj =>{
+              return {
+                ...obj,
+                DataHash : livenessDataHash,
+                Data : livenessData,
+              }
+          })
     })
 
-  },[livenessData])
+  },[livenessData, livenessDataHash])
 
   React.useEffect(()=>{
-    console.log(livenessDataHash)
-
-    setPassportData({ ...passportData ,  
-      face:  
-        [...passportData.face].map(obj =>{
-            return {
-              ...obj,
-              dataHash : livenessDataHash,
-            }
-        })
-    })
-
-  },[livenessDataHash])
-
-  React.useEffect(()=>{
-    console.log(livenessStatus)
-  },[livenessStatus])
-
-  React.useEffect(()=>{
-    console.log(livenessThumbnail)
-  },[livenessThumbnail])
-
-  React.useEffect(()=>{
-    //console.log(files[0]?.getFileEncodeBase64String())
-    //console.log(passportData)
-    //setPassportData({ ...passportData ,  subscriberDocuments: { ...passportData.subscriberDocuments, [passportData.subscriberDocuments[0].documentCode] : files[0]?.getFileEncodeBase64String() } })    
-    //setPassportData({ ...passportData ,  subscriberDocuments: { ...passportData.subscriberDocuments[0], documentCode : files[0]?.getFileEncodeBase64String() } })    
+    console.log(files[0]?.getFileEncodeBase64String())
     setPassportData({ ...passportData ,  
       subscriberDocuments:  
         [...passportData.subscriberDocuments].map(obj =>{
             return {
               ...obj,
-              dataPageScan : files[0]?.getFileEncodeBase64String()  
+              dataPageScan : files[0]?.getFileEncodeBase64String()  ,
+              secondPageScan : files[0]?.getFileEncodeBase64String()  
             }
         })      
     })    
@@ -548,14 +467,8 @@ function App() {
   },[passportData])
 
 
-  React.useEffect(()=>{
-    console.log(livenessErrors)
-  },[livenessErrors])
-
-
   
   return (
-    // <Container maxWidth="lg">
     <Box sx={{ width: '100%', margin:'3%'}}>
       <div className="loader" id="loader"></div>
       <div id="image-crop-container"></div>
@@ -568,7 +481,6 @@ function App() {
               //style={{backgroundColor:'#ff0000'}}
               onClick={handleLivenessCheck}
               endIcon={<SendIcon />}
-              //loading={livenessCheckLoading}
               loadingPosition="end"
               variant="contained"          
             >
@@ -576,21 +488,18 @@ function App() {
             </LoadingButton>
           </Item>          
           <Item>
-            <div style={{color:'red'}}>{livenessErrors}</div>
+            <div style={{color:'red'}}>{livenessErrors}</div>            
             <img src={livenessThumbnail} />
+            <div style={{color:'black'}}>{String(livenessStatus)}</div>
           </Item>
           <Item>
             <Stack direction="row" spacing={2}>
-              <TextField disabled label="Status" defaultValue={livenessStatus} style={{width:'100%'}} />
-              <TextField disabled label="Liveness Data Hash" defaultValue={livenessDataHash} style={{width:'100%'}} />
+              <TextField disabled label="Liveness Data Hash" defaultValue={livenessDataHash} style={{width:'100%'}} multiline rows="2" InputLabelProps={{ shrink: true }} />
             </Stack>
           </Item>
           <Item>
-            <TextField disabled label="Liveness Data" defaultValue={livenessData} style={{width:'100%'}}  multiline rows="6" />
+            <TextField disabled label="Liveness Data" defaultValue={livenessData} style={{width:'100%'}}  multiline rows="6" InputLabelProps={{ shrink: true }} />
           </Item>
-          {/* <Item>
-            <TextField disabled label="Liveness Data Hash" defaultValue={livenessDataHash} />
-          </Item> */}          
         </Grid>    
         <Grid xs={6}>
           <Item style={{width:'100%'}}>            
@@ -822,105 +731,15 @@ function App() {
               onClick={ sendPassportData }
               endIcon={<SendIcon />}
               disabled = { livenessData == "" ? true : false }
-              //loading={livenessCheckLoading}
               loadingPosition="end"
               variant="contained"          
             >
               Send Passport Data
             </LoadingButton>
-          </Item>
-       
+          </Item>      
         </Grid>
-        {/* <Grid xs={6}>
-          <Item>3</Item>
-        </Grid>
-        <Grid xs={6}>
-          <Item>4</Item>
-        </Grid> */}
       </Grid>
      </Box> 
-    // </Container>
-    // <div className="App">   
-    //   {/* <button id="initialize-face-capture" style={{display:'none', width:300, height:50, margin:'20px auto',borderRadius:8,cursor:'pointer'}} onClick={handleStartLives}>
-    //   START Liveness check
-    //   </button> */}
-    //    <LoadingButton
-    //       style={{backgroundColor:'#e10000'}}
-    //       //style={{backgroundColor:'#ff0000'}}
-    //       onClick={handleStartLives}
-    //       endIcon={<SendIcon />}
-    //       //loading={livenessCheckLoading}
-    //       loadingPosition="end"
-    //       variant="contained"          
-    //     >
-    //       Check Liveness
-    //     </LoadingButton>
-
-    //   <div id="image-crop-container"></div>
-
-    //   <div className="loader" id="loader"></div>
-
-    //   <div style={{color:'red'}}>{livenessErrors}</div>
-
-    //   <TextField
-    //       disabled
-    //       id="outlined-disabled"
-    //       label="Status"
-    //       defaultValue={livenessStatus}
-    //   />
-
-    //   {/* <textarea values= {"11 : " + livenessStatus} /> */}
-    //   {/* <div>Liveness Status</div>
-    //   <input
-    //     type="text"
-    //     value={livenessStatus}
-    //   /> */}
-    //   {/* <p /> */}
-
-    //   <TextField
-    //       disabled
-    //       id="outlined-disabled"
-    //       label="Liveness Data" 
-    //       defaultValue={livenessData}
-    //       multiline
-    //   />
-    //   {/* <div>Liveness Data</div>
-    //   <textarea
-    //     style= {{width:500, height: 100}}
-    //     type="text"
-    //     value={livenessData}
-    //   /> */}
-    //   <TextField
-    //       disabled
-    //       id="outlined-disabled"
-    //       label="Liveness Data Hash"
-    //       defaultValue={livenessDataHash}
-    //   />
-
-    //   {/* <p />
-    //   <div>Liveness Data Hash</div>
-    //   <input
-    //     type="text"
-    //     value={livenessDataHash}
-    //   /> */}
-    //   <p />
-    //   {/* <div>Liveness Thumbnail</div>
-    //   <img
-    //     type="text"
-    //     src={livenessThumbnail}
-    //     //value={livenessThumbnail}
-    //   /> */}
-
-    //   <div>Liveness Thumbnail</div>
-    //   <img    
-    //     src= {livenessThumbnail} //{`${item.img}?w=248&fit=crop&auto=format`}
-    //     //srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-    //     //alt={item.title}
-    //     //loading="lazy"
-    //   />
-
-    //   {/* <label type="text">{livenessStatus}</label> */}
-    // </div>
   );
 }
 
