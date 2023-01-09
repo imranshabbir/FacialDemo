@@ -1068,8 +1068,9 @@ function App() {
         </Grid>
 
         <Grid Item xs={3.9}>
-          <center style={{marginTop:57}}> LOG </center>
-          <TextField label="Logs" value={logs} style={{width:'100%'}} multiline rows={25} />
+          <center style={{marginTop:34}}>------------ LOG ------------</center>
+          
+          <TextField label="Logs" value={logs} style={{width:'100%', marginTop:15}} multiline rows={25} />
         </Grid>
       </Grid>
     </Box>  
