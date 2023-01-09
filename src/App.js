@@ -398,7 +398,7 @@ function App() {
   }
 
   const sendPassportData = async () => {
-    console.log("sendPassportData")
+    console.log("---------start sendPassportData----------")
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer " + livenessToken);
@@ -409,24 +409,44 @@ function App() {
       redirect: "follow",
     };
 
+    console.log("requestOptions")
+    console.log(requestOptions)
     let response = await fetch(url + "api/v1/Subscriber/FaceOnboarding", requestOptions);
 
-    console.log(response)
+    
     if (response.status === 200) {
+      //console.log(response)
       response.json().then((data) => {        
+        console.log(data)
+        console.log(data.subscriberId)
+        console.log(data.intermediaryTransactionId)
         setSubscriptionData({ ...subscriptionData , subscriberId : data.subscriberId, intermediaryTransactionId: data.intermediaryTransactionId })
+        //setSubscriptionData({ ...serviceData , subscriberId : data.subscriberId, intermediaryTransactionId: data.intermediaryTransactionId })
+        setServiceData({ ...serviceData ,  
+          intermediaryTransactionId : data.intermediaryTransactionId,
+          subscriptionServices:  
+            [...serviceData.subscriptionServices].map(obj =>{
+                return {
+                  ...obj,
+                  subscriptionNumber : data.subscriberId, 
+                }
+            })      
+        })        
       })
     }
     else
     {
-      response.json().then((data) => {
-        alert("Send Passport Data Api : " + data.errors[0].message);
-      });
+      //response.json().then((data) => {
+      //  alert("Send Passport Data Api : " + data.errors[0].message);
+      //});
+      console.log(response)
     }
+    console.log("---------end sendPassportData----------")
   };
 
   const sendSubscriptionData = async () => {
-    console.log("sendSubscriptionData")
+    console.log("-----------start sendSubscriptionData------------")
+    console.log(passportData)
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer " + livenessToken);
@@ -436,6 +456,8 @@ function App() {
       body: JSON.stringify(subscriptionData),
       redirect: "follow",
     };
+
+    console.log(requestOptions)
 
     let response = await fetch(url + "api/v1/Subscription/Add", requestOptions);
 
@@ -451,10 +473,12 @@ function App() {
         alert("Send Subscription Data Api : " + data.errors[0].message);
       });
     }
+    console.log("-----------end sendSubscriptionData------------")
   };
 
   const sendServicesData = async () => {
-    console.log("sendServicesData")
+    console.log("----------start sendServicesData-------------")
+    console.log(passportData)
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", "Bearer " + livenessToken);
@@ -465,6 +489,7 @@ function App() {
       redirect: "follow",
     };
 
+    console.log(requestOptions)
     let response = await fetch(url + "api/v1/Subscription/AssignServices", requestOptions);
 
     console.log(response)
@@ -479,6 +504,7 @@ function App() {
         alert("Send Send Services Api : " + data.errors[0].message);
       });
     }
+    console.log("----------end sendServicesData-------------")
   };
 
 
@@ -849,17 +875,17 @@ function App() {
         </Grid>
         <Grid xs={5}>
           <Item style={{width:'100%'}}>
-              <TextField  disabled label="Subscriber Id" defaultValue={"-9223372036854765742"} style={{width:'100%'}} 
+              <TextField  disabled label="Subscriber Id" value={subscriptionData.subscriberId} style={{width:'100%'}} 
                 //onChange = { e => setSubscriptionData({ ...subscriptionData , subscriberId : e.target.value}) }                
               />
           </Item> 
           <Item style={{width:'100%'}}>
-              <TextField disabled label="Intermediary Transaction Id" defaultValue={"{{intermediaryTransactionId}}"} style={{width:'100%'}} 
+              <TextField disabled label="Intermediary Transaction Id" value={subscriptionData.intermediaryTransactionId} style={{width:'100%'}} 
                 //onChange = { e => setSubscriptionData({ ...subscriptionData , intermediaryTransactionId : e.target.value}) }                
               />
           </Item> 
           <Item style={{width:'100%'}}>
-              <TextField label="Phone Number" defaultValue={"529866081"} style={{width:'100%'}} 
+              <TextField label="Phone Number" defaultValue={subscriptionData.subscriptions[0].phoneNumber} style={{width:'100%'}} 
                 onChange = { e => { 
                   setSubscriptionData({ ...subscriptionData ,  
                     subscriptions:  
@@ -874,7 +900,7 @@ function App() {
               />
           </Item> 
           <Item style={{width:'100%'}}>
-              <TextField label="Line Type" defaultValue={"1"} style={{width:'100%'}} 
+              <TextField label="Line Type" defaultValue={subscriptionData.subscriptions[0].lineType} style={{width:'100%'}} 
                 onChange = { e => { 
                   setSubscriptionData({ ...subscriptionData ,  
                     subscriptions:  
@@ -889,7 +915,7 @@ function App() {
               />
           </Item> 
           <Item style={{width:'100%'}}>
-              <TextField label="Service Type" defaultValue={"1"} style={{width:'100%'}} 
+              <TextField label="Service Type" defaultValue={subscriptionData.subscriptions[0].serviceType} style={{width:'100%'}} 
                 onChange = { e => { 
                   setSubscriptionData({ ...subscriptionData ,  
                     subscriptions:  
@@ -904,7 +930,7 @@ function App() {
               />
           </Item> 
           <Item style={{width:'100%'}}>
-              <TextField label="Channel Type" defaultValue={"1"} style={{width:'100%'}} 
+              <TextField label="Channel Type" defaultValue={subscriptionData.subscriptions[0].channelType} style={{width:'100%'}} 
                 onChange = { e => { 
                   setSubscriptionData({ ...subscriptionData ,  
                     subscriptions:  
@@ -919,7 +945,7 @@ function App() {
               />
           </Item> 
           <Item style={{width:'100%'}}>
-              <TextField label="Channel Type" defaultValue={"Khalifa City A, Abu Dhabi, UAE"} style={{width:'100%'}} 
+              <TextField label="Address" defaultValue={subscriptionData.subscriptions[0].address} style={{width:'100%'}} 
                 onChange = { e => { 
                   setSubscriptionData({ ...subscriptionData ,  
                     subscriptions:  
@@ -949,7 +975,7 @@ function App() {
         </Grid>
         <Grid xs={6}>
           <Item style={{width:'100%'}}>
-              <TextField label="Services" defaultValue={"-2147483642,-2147483641"} style={{width:'100%'}} 
+              <TextField label="Services" value={serviceData.subscriptionServices[0].services} style={{width:'100%'}} 
                 onChange = { e => { 
                   setServiceData({ ...serviceData ,  
                     intermediaryTransactionId : subscriptionData.intermediaryTransactionId,
