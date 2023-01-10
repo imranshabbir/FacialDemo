@@ -57,28 +57,67 @@ function App() {
   const [files, setFiles] = useState([]) 
   const [logs, setLogs] = useState('') 
   
+  // const [passportData,setPassportData] = useState({
+  //   emailAddress :"one@Test.com",
+  //   subscriberId : null,
+  //   subscriberDocuments :
+  //   [
+  //     {
+  //        identifierType :2,
+  //        documentCode :"P<",
+  //        issuingAuthority :"ARE",
+  //        documentNumber :"P123456",
+  //        registrantNumber :"",
+  //        DocumentIssueDate :"2012-04-15",
+  //        expiryDate :"2031-10-13",
+  //        primaryIdentifier :"GEORGE",
+  //        secondaryIdentifier :"FEDERICK",
+  //        birthDate :"1974-08-12",
+  //        gender :"M",
+  //        DocumentNationality :"ARE",
+  //        mrz :{            
+  //              line1 :"P<AREABDULLAH<<AHMAD<MOHAMAD<<<<<<<<<<<<<<<<",
+  //              line2 :"L898902C36ARE7408122F1204159ZE184226B<<<<<10",
+  //              line3 :"ABDULLAH<<AHMAD<MOHAMAD<<<<<<<"
+  //           },
+  //       dataPageScan : "",
+  //       secondPageScan :"",
+  //       nfcPortrait :"",
+  //       nfcSignature :"",
+  //       CroppedPortrait :"",
+  //     } ,    
+  //   ],
+  //   face:[
+  //       {
+  //         Data: "",
+  //         DataHash: "",
+  //         Tag: null
+  //       }
+  //   ]
+  // })
+
   const [passportData,setPassportData] = useState({
-    emailAddress :"one@Test.com",
+    emailAddress :"imran.shabbbir@gmail.com",
     subscriberId : null,
     subscriberDocuments :
     [
       {
          identifierType :2,
          documentCode :"P<",
-         issuingAuthority :"ARE",
-         documentNumber :"P123456",
+         issuingAuthority :"PAK",
+         documentNumber :"AK5135093",
          registrantNumber :"",
-         DocumentIssueDate :"2012-04-15",
-         expiryDate :"2031-10-13",
-         primaryIdentifier :"GEORGE",
-         secondaryIdentifier :"FEDERICK",
-         birthDate :"1974-08-12",
+         DocumentIssueDate :"2018-09-27",
+         expiryDate :"2023-09-26",
+         primaryIdentifier :"IMRAN",
+         secondaryIdentifier :"SHABBIR",
+         birthDate :"1977-11-09",
          gender :"M",
-         DocumentNationality :"ARE",
+         DocumentNationality :"PAK",
          mrz :{            
-               line1 :"P<AREABDULLAH<<AHMAD<MOHAMAD<<<<<<<<<<<<<<<<",
-               line2 :"L898902C36ARE7408122F1204159ZE184226B<<<<<10",
-               line3 :"ABDULLAH<<AHMAD<MOHAMAD<<<<<<<"
+               line1 :"P<PAKSHABBIR<<IMRAN<<<<<<<<<<<<<<<<<<<<<<<<<",
+               line2 :"AK51350936PAK7711097M23092683520227995093<64",
+               line3 :""
             },
         dataPageScan : "",
         secondPageScan :"",
@@ -97,7 +136,7 @@ function App() {
   })
 
   const [subscriptionData, setSubscriptionData] = useState({
-    subscriberId: -9223372036854775744,
+    subscriberId: -1000000000000000000,
     intermediaryTransactionId: "{{intermediaryTransactionId}}",
     subscriptions: [
       {
@@ -114,7 +153,7 @@ function App() {
     intermediaryTransactionId: "{{intermediaryTransactionId}}",
     subscriptionServices: [
       {
-        subscriptionNumber : -9223372036854775797,
+        subscriptionNumber : -1000000000000000000,
         services: [
           -2147483642
         ]
@@ -441,9 +480,14 @@ function App() {
     let response = await fetch(url + "api/v1/Subscriber/FaceOnboarding", requestOptions);
 
     
+    
     if (response.status === 200) {
       //console.log(response)
       response.json().then((data) => {        
+        console.log('-------start response-----------')
+        console.log(response)
+        console.log(data)
+        console.log('-------end response-----------')
         setLogs(logs => logs + 'Onboarding (passport) successful\n')
         console.log(data)
         console.log(data.subscriberId)
@@ -452,13 +496,13 @@ function App() {
         //setSubscriptionData({ ...serviceData , subscriberId : data.subscriberId, intermediaryTransactionId: data.intermediaryTransactionId })
         setServiceData({ ...serviceData ,  
           intermediaryTransactionId : data.intermediaryTransactionId,
-          subscriptionServices:  
-            [...serviceData.subscriptionServices].map(obj =>{
-                return {
-                  ...obj,
-                  subscriptionNumber : data.subscriberId, 
-                }
-            })      
+          // subscriptionServices:  
+          //   [...serviceData.subscriptionServices].map(obj =>{
+          //       return {
+          //         ...obj,
+          //         subscriptionNumber : data.subscriberId, 
+          //       }
+          //   })      
         })        
       })
     }
@@ -471,12 +515,12 @@ function App() {
 
       setLogs(logs => logs + 'Onboarding (passport) failure - ' + response.status + " " + response.statusText + '\n')
       
-      console.log(response)
+      
     }
     console.log("---------end sendPassportData----------")
   };
 
-  const sendSubscriptionData = async () => {
+  const sendSubscriptionData = async () => {    
     console.log("-----------start sendSubscriptionData------------")
     console.log(passportData)
     var myHeaders = new Headers();
@@ -497,7 +541,17 @@ function App() {
     if (response.status === 200) {
       setLogs(logs => logs + 'Add subscription successful\n')
       response.json().then((data) => {
-        //console.log(data)
+        console.log(data)
+        //console.log(data[0].subscriptionNumber)
+        setServiceData({ ...serviceData ,  
+          subscriptionServices:  
+            [...serviceData.subscriptionServices].map(obj =>{
+                return {
+                  ...obj,
+                  subscriptionNumber : data[0].subscriptionNumber, 
+                }
+            })      
+        })        
       })
     }
     else
@@ -689,7 +743,7 @@ function App() {
             <Grid>
               <Item style={{width:'100%'}}>            
                 <Stack direction="row" spacing={2}>
-                  <TextField label="Email" defaultValue={"one@Test.com"} style={{width:'100%'}} 
+                  <TextField label="Email" value={passportData.emailAddress} style={{width:'100%'}} 
                   onChange = { e => setPassportData({ ...passportData , emailAddress : e.target.value}) }   
                   />
                   <TextField label="Subscriber Id" defaultValue={""} style={{width:'100%'}} 
@@ -699,7 +753,7 @@ function App() {
               </Item>
               <Item style={{width:'100%'}}>            
                 <Stack direction="row" spacing={2}>
-                  <TextField label="Document Code" defaultValue={"P<"}  
+                  <TextField label="Document Code" value={passportData.subscriberDocuments[0].documentCode}  
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -712,7 +766,7 @@ function App() {
                     })                    
                   } }     
                   />
-                  <TextField label="Issuing Authority" defaultValue={"ARE"}  
+                  <TextField label="Issuing Authority" value={passportData.subscriberDocuments[0].issuingAuthority}
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -725,7 +779,7 @@ function App() {
                     })                    
                   } }    
                   />
-                  <TextField label="Document Number" defaultValue={"P123456"}  
+                  <TextField label="Document Number" value={passportData.subscriberDocuments[0].documentNumber}  
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -738,7 +792,7 @@ function App() {
                     })                    
                   } }    
                   />  
-                  <TextField label="Registrant Number" defaultValue={""}  
+                  <TextField label="Registrant Number" value={passportData.subscriberDocuments[0].registrantNumber}  
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -755,20 +809,20 @@ function App() {
               </Item>
               <Item style={{width:'100%'}}>
                 <Stack direction="row" spacing={2}>              
-                  <TextField label="Document Issue Date" defaultValue={"2012-04-15"}  
+                  <TextField label="Document Issue Date" value={passportData.subscriberDocuments[0].DocumentIssueDate}  
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
                         [...passportData.subscriberDocuments].map(obj =>{
                             return {
                               ...obj,
-                              documentIssueDate : e.target.value,
+                              DocumentIssueDate : e.target.value,
                             }
                         })      
                     })                    
                   } }    
                   />
-                  <TextField label="Expiry Date" defaultValue={"2031-10-13"}  
+                  <TextField label="Expiry Date" value={passportData.subscriberDocuments[0].expiryDate}  
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -781,7 +835,7 @@ function App() {
                     })                    
                   } }    
                   />
-                  <TextField label="Primary Identifier" defaultValue={"GEORGE"}  
+                  <TextField label="Primary Identifier" value={passportData.subscriberDocuments[0].primaryIdentifier}  
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -794,7 +848,7 @@ function App() {
                     })                    
                   } }    
                   />
-                  <TextField label="Secondary Identifier" defaultValue={"FEDERICK"} 
+                  <TextField label="Secondary Identifier" value={passportData.subscriberDocuments[0].secondaryIdentifier} 
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -811,7 +865,7 @@ function App() {
               </Item>
               <Item style={{width:'100%'}}>
                 <Stack direction="row" spacing={2}>              
-                  <TextField label="Birth Date" defaultValue={"1974-08-12"}  
+                  <TextField label="Birth Date" value={passportData.subscriberDocuments[0].birthDate}  
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -824,7 +878,7 @@ function App() {
                     })                    
                   } }    
                   />
-                  <TextField label="Gender" defaultValue={"M"}  
+                  <TextField label="Gender" value={ passportData.subscriberDocuments[0].gender }  
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -837,14 +891,14 @@ function App() {
                     })                    
                   } }    
                   />
-                  <TextField label="Document Nationality" defaultValue={"ARE"}  
+                  <TextField label="Document Nationality" value={ passportData.subscriberDocuments[0].DocumentNationality }  
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
                         [...passportData.subscriberDocuments].map(obj =>{
                             return {
                               ...obj,
-                              documentNationality : e.target.value,
+                              DocumentNationality : e.target.value,
                             }
                         })      
                     })                    
@@ -854,7 +908,7 @@ function App() {
                 </Stack>       
               </Item>
               <Item style={{width:'100%'}}>
-                  <TextField label="Line 1" defaultValue={"P<AREABDULLAH<<AHMAD<MOHAMAD<<<<<<<<<<<<<<<<"} style={{width:'100%'}} 
+                  <TextField label="Line 1" value={passportData.subscriberDocuments[0].mrz.line1} style={{width:'100%'}} 
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -869,7 +923,7 @@ function App() {
                   />
               </Item> 
               <Item style={{width:'100%'}}>
-                  <TextField label="Line 2" defaultValue={"L898902C36ARE7408122F1204159ZE184226B<<<<<10"} style={{width:'100%'}} 
+                  <TextField label="Line 2" value={passportData.subscriberDocuments[0].mrz.line2} style={{width:'100%'}} 
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -884,7 +938,7 @@ function App() {
                   />
               </Item> 
               <Item style={{width:'100%'}}>
-                  <TextField label="Line 3" defaultValue={"ABDULLAH<<AHMAD<MOHAMAD<<<<<<<"} style={{width:'100%'}} 
+                  <TextField label="Line 3" value={passportData.subscriberDocuments[0].mrz.line3} style={{width:'100%'}} 
                   onChange = { e => { 
                     setPassportData({ ...passportData ,  
                       subscriberDocuments:  
@@ -929,12 +983,12 @@ function App() {
             <TabPanel value="4">
               <Grid>
                 <Item style={{width:'100%'}}>
-                    <TextField  disabled label="Subscriber Id" value={subscriptionData.subscriberId} style={{width:'100%'}} 
+                    <TextField  disabled label="Subscriber Id Received From Onboarding" value={subscriptionData.subscriberId} style={{width:'100%'}} 
                       //onChange = { e => setSubscriptionData({ ...subscriptionData , subscriberId : e.target.value}) }                
                     />
                 </Item> 
                 <Item style={{width:'100%'}}>
-                    <TextField disabled label="Intermediary Transaction Id" value={subscriptionData.intermediaryTransactionId} style={{width:'100%'}} 
+                    <TextField disabled label="Intermediary Transaction Id Received From Onboarding" value={subscriptionData.intermediaryTransactionId} style={{width:'100%'}} 
                       //onChange = { e => setSubscriptionData({ ...subscriptionData , intermediaryTransactionId : e.target.value}) }                
                     />
                 </Item> 
@@ -1033,6 +1087,9 @@ function App() {
             <TabPanel value="5">
               <Grid>
               <Item style={{width:'100%'}}>
+                  <TextField label="Subscription Number Received With Add Subscription" value={serviceData.subscriptionServices[0].subscriptionNumber} style={{width:'100%'}} />
+              </Item>
+              <Item style={{width:'100%'}}>
                   <TextField label="Services" value={serviceData.subscriptionServices[0].services} style={{width:'100%'}} 
                       onChange = { e => { 
                         setServiceData({ ...serviceData ,  
@@ -1041,7 +1098,6 @@ function App() {
                             [...serviceData.subscriptionServices].map(obj =>{
                                 return {
                                   ...obj,
-                                  subscriptionNumber : subscriptionData.subscriberId,
                                   services : [e.target.value],
                                 }
                             })      
