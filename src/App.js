@@ -21,6 +21,8 @@ import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css'
 import FilePondPluginFileEncode from 'filepond-plugin-file-encode';
 import { ConstructionOutlined, VolunteerActivismOutlined } from "@mui/icons-material";
 //import { ContactSupportOutlined } from "@mui/icons-material";
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
@@ -41,8 +43,8 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 function App() {
-  const [url, setUrl] = useState("https://etisalatssms.server.aicenter.ae/")
-  const [user, setUser] = useState("dev.etisalat@tdra.ae")
+  const [url, setUrl] = useState("https://etisalatssmsuat.server.aicenter.ae/")
+  const [user, setUser] = useState("uat.etisalat@tdra.ae")
   const [password, setPassword] = useState("")
 
   const [livenessToken, setLivenessToken] = useState("")
@@ -276,6 +278,37 @@ function App() {
       },
     });
   }
+
+  const test = async (token) => {
+    try {
+      var myHeaders = new Headers();
+      var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+      
+      let result = await fetch(
+        "http://localhost:21630/weatherforecast/one",
+        requestOptions
+      );
+      
+      if (result.status === 200) {
+        await result.json().then((resultConfig) => {
+          if (resultConfig) {
+            config = resultConfig.data;
+            setLogs(logs => logs + 'Success in getting config\n')
+            
+            setLivenessConfig(resultConfig.data)
+            setSecretKey(token);
+          }
+        });
+      }
+    } catch (err) {
+      setLogs(logs => logs + 'Failure getting config ' + err + '\n')
+      console.error(err);
+    }
+  };
 
 
 
@@ -539,19 +572,22 @@ function App() {
 
     console.log(response)
     if (response.status === 200) {
-      setLogs(logs => logs + 'Add subscription successful\n')
-      response.json().then((data) => {
+      setLogs(logs => logs + 'Add subscription successful\n')      
+      response.json().then((data) => {        
         console.log(data)
         //console.log(data[0].subscriptionNumber)
-        setServiceData({ ...serviceData ,  
-          subscriptionServices:  
-            [...serviceData.subscriptionServices].map(obj =>{
-                return {
-                  ...obj,
-                  subscriptionNumber : data[0].subscriptionNumber, 
-                }
-            })      
-        })        
+
+        // setServiceData({ ...serviceData ,  
+        //   subscriptionServices:  
+        //     [...serviceData.subscriptionServices].map(obj =>{
+        //         return {
+        //           ...obj,
+        //           subscriptionNumber : data[0].subscriptionNumber, 
+        //         }
+        //     })      
+        // })        
+
+        setSubscriptions(data)
       })
     }
     else
@@ -586,7 +622,7 @@ function App() {
     if (response.status === 200) {
       setLogs(logs => logs + 'Assign service successful\n')
       response.json().then((data) => {
-        //console.log(data)
+        console.log(data)
       })
     }
     else
@@ -669,6 +705,13 @@ function App() {
   //   }
   // ];
 
+  const [subscriptions, setSubscriptions] = React.useState([]);
+  //const [selectedSubscription, setSelectedSubscription] = React.useState();
+
+  // const handleSubscriptionSelection = (e) => {
+  //   setValue(newValue);
+  // };
+
   const [value, setValue] = React.useState('1');
 
   const handleChange = (event, newValue) => {
@@ -693,14 +736,14 @@ function App() {
             </Box>
             <TabPanel value="1">
                 <Stack direction="row" spacing={2}>
-                  <TextField disabled label="User" defaultValue={user} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
+                  <TextField label="User" defaultValue={user} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
                   onChange = { e => setUser(e.target.value) }   />
-                  <TextField label="Password" defaultValue={password} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
+                  <TextField type="password" label="Password" defaultValue={password} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
                   onChange = { e => setPassword(e.target.value) } />
                 </Stack>
                 <p />
                 <Stack direction="row" spacing={2}>
-                  <TextField disabled label="URL" defaultValue={url} style={{width:'100%'}} InputLabelProps={{ shrink: true }} onChange = { e => setUrl(e.target.value) }/>
+                  <TextField label="URL" defaultValue={url} style={{width:'100%'}} InputLabelProps={{ shrink: true }} onChange = { e => setUrl(e.target.value) }/>
                   <LoadingButton
                     style={{backgroundColor:'#e10000'}}
                     //style={{backgroundColor:'#ff0000'}}
@@ -1007,7 +1050,7 @@ function App() {
                       } }     
                     />
                 </Item> 
-                <Item style={{width:'100%'}}>
+                {/* <Item style={{width:'100%'}}>
                     <TextField label="Line Type" defaultValue={subscriptionData.subscriptions[0].lineType} style={{width:'100%'}} 
                       onChange = { e => { 
                         setSubscriptionData({ ...subscriptionData ,  
@@ -1015,14 +1058,39 @@ function App() {
                             [...subscriptionData.subscriptions].map(obj =>{
                                 return {
                                   ...obj,
-                                  lineType : e.target.value,
+                                  lineType : parseInt(e.target.value),
                                 }
                             })      
                         })                    
                       } }     
                     />
-                </Item> 
-                <Item style={{width:'100%'}}>
+                </Item>  */}
+                 <Item style={{width:'100%'}}>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={ subscriptionData.subscriptions[0].lineType }
+                    label = "Services"
+                    onChange={e => {
+                      setSubscriptionData({ ...subscriptionData ,  
+                        subscriptions:  
+                          [...subscriptionData.subscriptions].map(obj =>{
+                              return {
+                                ...obj,
+                                lineType : parseInt(e.target.value),
+                              }
+                          })      
+                      })        
+                    }}
+                    style={{width:'100%'}}
+                  >
+                    <MenuItem value='1'>Mobile</MenuItem>
+                    <MenuItem value='2'>Landline</MenuItem>                    
+                  </Select>
+                </Item>
+
+
+                {/* <Item style={{width:'100%'}}>
                     <TextField label="Service Type" defaultValue={subscriptionData.subscriptions[0].serviceType} style={{width:'100%'}} 
                       onChange = { e => { 
                         setSubscriptionData({ ...subscriptionData ,  
@@ -1030,14 +1098,38 @@ function App() {
                             [...subscriptionData.subscriptions].map(obj =>{
                                 return {
                                   ...obj,
-                                  serviceType : e.target.value,
+                                  serviceType : parseInt(e.target.value),
                                 }
                             })      
                         })                    
                       } }     
                     />
-                </Item> 
-                <Item style={{width:'100%'}}>
+                </Item>  */}
+                 <Item style={{width:'100%'}}>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={ subscriptionData.subscriptions[0].serviceType }
+                    label = "Services"
+                    onChange={e => {
+                      setSubscriptionData({ ...subscriptionData ,  
+                        subscriptions:  
+                          [...subscriptionData.subscriptions].map(obj =>{
+                              return {
+                                ...obj,
+                                serviceType : parseInt(e.target.value),
+                              }
+                          })      
+                      })       
+                    }}
+                    style={{width:'100%'}}
+                  >
+                    <MenuItem value='1'>Prepaid</MenuItem>
+                    <MenuItem value='2'>Postpaid</MenuItem>                    
+                  </Select>
+                </Item>
+
+                {/* <Item style={{width:'100%'}}>
                     <TextField label="Channel Type" defaultValue={subscriptionData.subscriptions[0].channelType} style={{width:'100%'}} 
                       onChange = { e => { 
                         setSubscriptionData({ ...subscriptionData ,  
@@ -1045,13 +1137,36 @@ function App() {
                             [...subscriptionData.subscriptions].map(obj =>{
                                 return {
                                   ...obj,
-                                  channelType : e.target.value,
+                                  channelType : parseInt(e.target.value),
                                 }
                             })      
                         })                    
                       } }     
                     />
-                </Item> 
+                </Item>  */}
+                 <Item style={{width:'100%'}}>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={ subscriptionData.subscriptions[0].channelType }
+                    label = "Services"
+                    onChange={e => {
+                      setSubscriptionData({ ...subscriptionData ,  
+                        subscriptions:  
+                          [...subscriptionData.subscriptions].map(obj =>{
+                              return {
+                                ...obj,
+                                channelType : parseInt(e.target.value),
+                              }
+                          })      
+                      })        
+                    }}
+                    style={{width:'100%'}}
+                  >
+                    <MenuItem value='1'>Digital</MenuItem>
+                    <MenuItem value='2'>Store</MenuItem>                    
+                  </Select>
+                </Item>
                 <Item style={{width:'100%'}}>
                     <TextField label="Address" defaultValue={subscriptionData.subscriptions[0].address} style={{width:'100%'}} 
                       onChange = { e => { 
@@ -1090,6 +1205,31 @@ function App() {
                   <TextField label="Subscription Number Received With Add Subscription" value={serviceData.subscriptionServices[0].subscriptionNumber} style={{width:'100%'}} />
               </Item>
               <Item style={{width:'100%'}}>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={ serviceData.subscriptionServices[0].subscriptionNumber }
+                    label = "Subscription"
+                    onChange={e => {
+                        setServiceData({ ...serviceData ,  
+                          subscriptionServices:  
+                            [...serviceData.subscriptionServices].map(obj =>{
+                                return {
+                                  ...obj,
+                                  subscriptionNumber : e.target.value, 
+                                }
+                            })      
+                        })    
+                    }}
+                    style={{width:'100%'}}
+                  >
+                    {/* <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem> */}
+                    { subscriptions?.map((obj) => <MenuItem value={obj.subscriptionNumber}>{obj.phoneNumber}</MenuItem> ) }
+                  </Select>
+              </Item>
+              {/* <Item style={{width:'100%'}}>
                   <TextField label="Services" value={serviceData.subscriptionServices[0].services} style={{width:'100%'}} 
                       onChange = { e => { 
                         setServiceData({ ...serviceData ,  
@@ -1104,7 +1244,36 @@ function App() {
                         })                    
                       } }     
                     />
-                </Item>
+                </Item> */}
+                 <Item style={{width:'100%'}}>
+                  <Select
+                    labelId="demo-simple-select-standard-label"
+                    id="demo-simple-select-standard"
+                    value={ serviceData.subscriptionServices[0].services }
+                    label = "Services"
+                    onChange={e => {
+                        setServiceData({ ...serviceData ,  
+                          subscriptionServices:  
+                            [...serviceData.subscriptionServices].map(obj =>{
+                                return {
+                                  ...obj,
+                                  services : [e.target.value], 
+                                }
+                            })      
+                        })    
+                    }}
+                    style={{width:'100%'}}
+                  >
+                    {/* <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem> */}
+                    <MenuItem value='-2147483642'>Freedom 325</MenuItem>
+                    <MenuItem value='-2147483641'>Unlimited 325</MenuItem>
+                    <MenuItem value='-2147483640'>Plan 260</MenuItem>
+                    <MenuItem value='-2147483639'>Non-Stop 250</MenuItem>
+                    <MenuItem value='-2147483638'>International</MenuItem>
+                  </Select>
+              </Item>
                 <Item style={{width:'100%'}}>
                   <LoadingButton
                       style={{backgroundColor:'#e10000'}}
@@ -1117,7 +1286,7 @@ function App() {
                     >
                       Assign Services
                   </LoadingButton>
-                </Item>      
+                </Item>                      
               </Grid>
             </TabPanel>
           </TabContext>
@@ -1130,436 +1299,7 @@ function App() {
         </Grid>
       </Grid>
     </Box>  
-    // <Box sx={{ width: '100%', margin:'3%'}}>
-    //   <div className="loader" id="loader"></div>
-    //   <div id="image-crop-container"></div>
-    //   <p />
-    //   <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-    //     <Grid Item xs={11}>          
-    //       <Item style={{width:'100%'}}>            
-    //         <Stack direction="row" spacing={2}>
-    //           <TextField disabled label="User" defaultValue={user} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
-    //           onChange = { e => setUser(e.target.value) }   />
-    //           <TextField label="Password" defaultValue={password} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
-    //           onChange = { e => setPassword(e.target.value) } />
-    //         </Stack>
-    //       </Item>
-    //       <Item style={{width:'100%'}}>            
-    //         <Stack direction="row" spacing={2}>
-    //           <TextField disabled label="URL" defaultValue={url} style={{width:'100%'}} InputLabelProps={{ shrink: true }} 
-    //             onChange = { e => setUrl(e.target.value) }
-    //           />
-    //           <LoadingButton
-    //           style={{backgroundColor:'#e10000'}}
-    //           //style={{backgroundColor:'#ff0000'}}
-    //           onClick={rhservrLogin}
-    //           endIcon={<SendIcon />}
-    //           loadingPosition="end"
-    //           variant="contained"          
-    //           >
-    //             Login
-    //           </LoadingButton>
-    //         </Stack>
-    //       </Item>
-    //     </Grid>
-    //     <Grid Item xs={5}>          
-    //       <Item>          
-    //         <LoadingButton
-    //           style={{backgroundColor:'#e10000'}}
-    //           //style={{backgroundColor:'#ff0000'}}
-    //           onClick={handleLivenessCheck}
-    //           endIcon={<SendIcon />}
-    //           loadingPosition="end"
-    //           variant="contained"          
-    //         >
-    //           Check Liveness
-    //         </LoadingButton>
-    //       </Item>          
-    //       <Item>
-    //         <div style={{color:'red'}}>{livenessErrors}</div>            
-    //         <img src={livenessThumbnail} />           
-    //         <div style={{color:'black'}}>{String(livenessStatus)}</div>
-    //       </Item>
-    //       <Item>
-    //         <Stack direction="row" spacing={2}>
-    //           <TextField disabled label="Liveness Data Hash" defaultValue={livenessDataHash} style={{width:'100%'}} multiline rows="2" />
-    //         </Stack>
-    //       </Item>
-    //       <Item>
-    //         <TextField disabled label="Liveness Data" defaultValue={livenessData} style={{width:'100%'}}  multiline rows="6" InputLabelProps={{ shrink: true }} />
-    //       </Item>
-    //     </Grid>    
-    //     <Grid xs={6}>
-    //       <Item style={{width:'100%'}}>            
-    //         <Stack direction="row" spacing={2}>
-    //           <TextField label="Email" defaultValue={"one@Test.com"} style={{width:'100%'}} 
-    //           onChange = { e => setPassportData({ ...passportData , emailAddress : e.target.value}) }   
-    //           />
-    //           <TextField label="Subscriber Id" defaultValue={""} style={{width:'100%'}} 
-    //           onChange = { e => setPassportData({ ...passportData , subscriberId : e.target.value}) }   
-    //           />
-    //         </Stack>            
-    //       </Item>
-    //       <Item style={{width:'100%'}}>            
-    //         <Stack direction="row" spacing={2}>
-    //           <TextField label="Document Code" defaultValue={"P<"}  
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       documentCode : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }     
-    //           />
-    //           <TextField label="Issuing Authority" defaultValue={"ARE"}  
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       issuingAuthority : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //           <TextField label="Document Number" defaultValue={"P123456"}  
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       documentNumber : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />  
-    //           <TextField label="Registrant Number" defaultValue={""}  
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       registrantNumber : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //         </Stack>            
-    //       </Item>
-    //       <Item style={{width:'100%'}}>
-    //         <Stack direction="row" spacing={2}>              
-    //           <TextField label="Document Issue Date" defaultValue={"2012-04-15"}  
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       documentIssueDate : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //           <TextField label="Expiry Date" defaultValue={"2031-10-13"}  
-    //            onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       expiryDate : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //           <TextField label="Primary Identifier" defaultValue={"GEORGE"}  
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       primaryIdentifier : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //           <TextField label="Secondary Identifier" defaultValue={"FEDERICK"} 
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       secondaryIdentifier : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //         </Stack>       
-    //       </Item>
-    //       <Item style={{width:'100%'}}>
-    //         <Stack direction="row" spacing={2}>              
-    //           <TextField label="Birth Date" defaultValue={"1974-08-12"}  
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       birthDate : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //           <TextField label="Gender" defaultValue={"M"}  
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       gender : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //           <TextField label="Document Nationality" defaultValue={"ARE"}  
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       documentNationality : e.target.value,
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //           <div style={{width:"25%"}} />
-    //         </Stack>       
-    //       </Item>
-    //       <Item style={{width:'100%'}}>
-    //           <TextField label="Line 1" defaultValue={"P<AREABDULLAH<<AHMAD<MOHAMAD<<<<<<<<<<<<<<<<"} style={{width:'100%'}} 
-    //            onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       mrz : { ...obj.mrz, line1 : e.target.value }
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //           <TextField label="Line 2" defaultValue={"L898902C36ARE7408122F1204159ZE184226B<<<<<10"} style={{width:'100%'}} 
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       mrz : { ...obj.mrz, line2 : e.target.value }
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //           <TextField label="Line 3" defaultValue={"ABDULLAH<<AHMAD<MOHAMAD<<<<<<<"} style={{width:'100%'}} 
-    //           onChange = { e => { 
-    //             setPassportData({ ...passportData ,  
-    //               subscriberDocuments:  
-    //                 [...passportData.subscriberDocuments].map(obj =>{
-    //                     return {
-    //                       ...obj,
-    //                       mrz : { ...obj.mrz, line3 : e.target.value }
-    //                     }
-    //                 })      
-    //             })                    
-    //            } }    
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //         <FilePond
-    //           files={files}
-    //           onupdatefiles={setFiles}
-    //           //allowMultiple={true}
-    //           maxFiles={1}
-    //           //server="/api"
-    //           name="files"  // sets the file input name, it's filepond by default 
-    //           labelIdle='Upload Passport Image'
-    //           allowFileEncode={true}
-    //         />
 
-    //       <LoadingButton
-    //           style={{backgroundColor:'#e10000'}}
-    //           //style={{backgroundColor:'#ff0000'}}
-    //           onClick={ sendPassportData }
-    //           endIcon={<SendIcon />}
-    //           disabled = { livenessData == "" ? true : false }
-    //           loadingPosition="end"
-    //           variant="contained"          
-    //         >
-    //           Send Passport Data
-    //         </LoadingButton>
-    //       </Item>      
-    //     </Grid>
-    //     <Grid xs={5}>
-    //       <Item style={{width:'100%'}}>
-    //           <TextField  disabled label="Subscriber Id" value={subscriptionData.subscriberId} style={{width:'100%'}} 
-    //             //onChange = { e => setSubscriptionData({ ...subscriptionData , subscriberId : e.target.value}) }                
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //           <TextField disabled label="Intermediary Transaction Id" value={subscriptionData.intermediaryTransactionId} style={{width:'100%'}} 
-    //             //onChange = { e => setSubscriptionData({ ...subscriptionData , intermediaryTransactionId : e.target.value}) }                
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //           <TextField label="Phone Number" defaultValue={subscriptionData.subscriptions[0].phoneNumber} style={{width:'100%'}} 
-    //             onChange = { e => { 
-    //               setSubscriptionData({ ...subscriptionData ,  
-    //                 subscriptions:  
-    //                   [...subscriptionData.subscriptions].map(obj =>{
-    //                       return {
-    //                         ...obj,
-    //                         phoneNumber : e.target.value,
-    //                       }
-    //                   })      
-    //               })                    
-    //              } }     
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //           <TextField label="Line Type" defaultValue={subscriptionData.subscriptions[0].lineType} style={{width:'100%'}} 
-    //             onChange = { e => { 
-    //               setSubscriptionData({ ...subscriptionData ,  
-    //                 subscriptions:  
-    //                   [...subscriptionData.subscriptions].map(obj =>{
-    //                       return {
-    //                         ...obj,
-    //                         lineType : e.target.value,
-    //                       }
-    //                   })      
-    //               })                    
-    //              } }     
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //           <TextField label="Service Type" defaultValue={subscriptionData.subscriptions[0].serviceType} style={{width:'100%'}} 
-    //             onChange = { e => { 
-    //               setSubscriptionData({ ...subscriptionData ,  
-    //                 subscriptions:  
-    //                   [...subscriptionData.subscriptions].map(obj =>{
-    //                       return {
-    //                         ...obj,
-    //                         serviceType : e.target.value,
-    //                       }
-    //                   })      
-    //               })                    
-    //              } }     
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //           <TextField label="Channel Type" defaultValue={subscriptionData.subscriptions[0].channelType} style={{width:'100%'}} 
-    //             onChange = { e => { 
-    //               setSubscriptionData({ ...subscriptionData ,  
-    //                 subscriptions:  
-    //                   [...subscriptionData.subscriptions].map(obj =>{
-    //                       return {
-    //                         ...obj,
-    //                         channelType : e.target.value,
-    //                       }
-    //                   })      
-    //               })                    
-    //              } }     
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //           <TextField label="Address" defaultValue={subscriptionData.subscriptions[0].address} style={{width:'100%'}} 
-    //             onChange = { e => { 
-    //               setSubscriptionData({ ...subscriptionData ,  
-    //                 subscriptions:  
-    //                   [...subscriptionData.subscriptions].map(obj =>{
-    //                       return {
-    //                         ...obj,
-    //                         address : e.target.value,
-    //                       }
-    //                   })      
-    //               })                    
-    //              } }     
-    //           />
-    //       </Item> 
-    //       <Item style={{width:'100%'}}>
-    //         <LoadingButton
-    //             style={{backgroundColor:'#e10000'}}
-    //             //style={{backgroundColor:'#ff0000'}}
-    //             onClick={ sendSubscriptionData }
-    //             endIcon={<SendIcon />}
-    //             //disabled = { livenessData == "" ? true : false }
-    //             loadingPosition="end"
-    //             variant="contained"          
-    //           >
-    //             Add Subscription
-    //         </LoadingButton>
-    //       </Item>      
-    //     </Grid>
-    //     <Grid xs={6}>
-    //       <Item style={{width:'100%'}}>
-    //           <TextField label="Services" value={serviceData.subscriptionServices[0].services} style={{width:'100%'}} 
-    //             onChange = { e => { 
-    //               setServiceData({ ...serviceData ,  
-    //                 intermediaryTransactionId : subscriptionData.intermediaryTransactionId,
-    //                 subscriptionServices:  
-    //                   [...serviceData.subscriptionServices].map(obj =>{
-    //                       return {
-    //                         ...obj,
-    //                         subscriptionNumber : subscriptionData.subscriberId,
-    //                         services : [e.target.value],
-    //                       }
-    //                   })      
-    //               })                    
-    //              } }     
-    //           />
-    //       </Item>
-    //       <Item style={{width:'100%'}}>
-    //         <LoadingButton
-    //             style={{backgroundColor:'#e10000'}}
-    //             //style={{backgroundColor:'#ff0000'}}
-    //             onClick={ sendServicesData }
-    //             endIcon={<SendIcon />}
-    //             //disabled = { livenessData == "" ? true : false }
-    //             loadingPosition="end"
-    //             variant="contained"          
-    //           >
-    //             Assign Services
-    //         </LoadingButton>
-    //       </Item>      
-    //     </Grid>
-    //   </Grid>
-    //  </Box> 
   );
 }
 
