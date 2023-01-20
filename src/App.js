@@ -521,14 +521,14 @@ function App() {
         console.log(response)
         console.log(data)
         console.log('-------end response-----------')
-        if (data,result.code == 1)
+        if (data.result.code == 1)
         {
           setLogs(logs => logs + 'Onboarding (passport) successful\n')
         }
         else
         {
           setLogs(logs => logs + 'Onboarding (passport) failure\n')
-          return;
+          //return;
         }
 
         console.log(data)
