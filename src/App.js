@@ -521,7 +521,16 @@ function App() {
         console.log(response)
         console.log(data)
         console.log('-------end response-----------')
-        setLogs(logs => logs + 'Onboarding (passport) successful\n')
+        if (data,result.code == 1)
+        {
+          setLogs(logs => logs + 'Onboarding (passport) successful\n')
+        }
+        else
+        {
+          setLogs(logs => logs + 'Onboarding (passport) failure\n')
+          return;
+        }
+
         console.log(data)
         console.log(data.subscriberId)
         console.log(data.intermediaryTransactionId)
