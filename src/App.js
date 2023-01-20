@@ -527,8 +527,8 @@ function App() {
         }
         else
         {
-          setLogs(logs => logs + 'Onboarding (passport) failure\n')
-          //return;
+          setLogs(logs => logs + 'Onboarding (passport) failure failure reason ' + data.result.code + ' - ' + data.result.message + ' \n')
+          return;
         }
 
         console.log(data)
