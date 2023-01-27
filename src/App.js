@@ -22,6 +22,9 @@ import FilePondPluginFileEncode from 'filepond-plugin-file-encode';
 import { ConstructionOutlined, VolunteerActivismOutlined } from "@mui/icons-material";
 //import { ContactSupportOutlined } from "@mui/icons-material";
 import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+
 import MenuItem from '@mui/material/MenuItem';
 
 import Tab from '@mui/material/Tab';
@@ -1075,27 +1078,32 @@ function App() {
                     />
                 </Item>  */}
                  <Item style={{width:'100%'}}>
-                  <Select
-                    labelId="demo-simple-select-standard-label"
-                    id="demo-simple-select-standard"
-                    value={ subscriptionData.subscriptions[0].lineType }
-                    label = "Services"
-                    onChange={e => {
-                      setSubscriptionData({ ...subscriptionData ,  
-                        subscriptions:  
-                          [...subscriptionData.subscriptions].map(obj =>{
-                              return {
-                                ...obj,
-                                lineType : parseInt(e.target.value),
-                              }
-                          })      
-                      })        
-                    }}
-                    style={{width:'100%'}}
-                  >
-                    <MenuItem value='1'>Mobile</MenuItem>
-                    <MenuItem value='2'>Landline</MenuItem>                    
-                  </Select>
+                    <FormControl style={{width:'100%'}}>
+                      <InputLabel shrink htmlFor="select-multiple-native">
+                      Line Type
+                      </InputLabel>
+                      <Select
+                        labelId="demo-simple-select-standard-label"                    
+                        id="demo-simple-select-standard"
+                        value={ subscriptionData.subscriptions[0].lineType }
+                        label = "Line Type"
+                        onChange={e => {
+                          setSubscriptionData({ ...subscriptionData ,  
+                            subscriptions:  
+                              [...subscriptionData.subscriptions].map(obj =>{
+                                  return {
+                                    ...obj,
+                                    lineType : parseInt(e.target.value),
+                                  }
+                              })      
+                          })        
+                        }}
+                        style={{width:'100%'}}
+                      >
+                        <MenuItem value='1'>Mobile</MenuItem>
+                        <MenuItem value='2'>Landline</MenuItem>                    
+                      </Select>
+                      </FormControl>
                 </Item>
 
 
@@ -1115,27 +1123,32 @@ function App() {
                     />
                 </Item>  */}
                  <Item style={{width:'100%'}}>
-                  <Select
-                    labelId="demo-simple-select-standard-label"
-                    id="demo-simple-select-standard"
-                    value={ subscriptionData.subscriptions[0].serviceType }
-                    label = "Services"
-                    onChange={e => {
-                      setSubscriptionData({ ...subscriptionData ,  
-                        subscriptions:  
-                          [...subscriptionData.subscriptions].map(obj =>{
-                              return {
-                                ...obj,
-                                serviceType : parseInt(e.target.value),
-                              }
-                          })      
-                      })       
-                    }}
-                    style={{width:'100%'}}
-                  >
-                    <MenuItem value='1'>Prepaid</MenuItem>
-                    <MenuItem value='2'>Postpaid</MenuItem>                    
-                  </Select>
+                 <FormControl style={{width:'100%'}}>
+                    <InputLabel shrink htmlFor="select-multiple-native">
+                      Service Type
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-standard-label"
+                      id="demo-simple-select-standard"
+                      value={ subscriptionData.subscriptions[0].serviceType }
+                      label = "Service Type"
+                      onChange={e => {
+                        setSubscriptionData({ ...subscriptionData ,  
+                          subscriptions:  
+                            [...subscriptionData.subscriptions].map(obj =>{
+                                return {
+                                  ...obj,
+                                  serviceType : parseInt(e.target.value),
+                                }
+                            })      
+                        })       
+                      }}
+                      style={{width:'100%'}}
+                    >
+                      <MenuItem value='1'>Prepaid</MenuItem>
+                      <MenuItem value='2'>Postpaid</MenuItem>                    
+                    </Select>
+                  </FormControl>
                 </Item>
 
                 {/* <Item style={{width:'100%'}}>
@@ -1154,11 +1167,15 @@ function App() {
                     />
                 </Item>  */}
                  <Item style={{width:'100%'}}>
+                 <FormControl style={{width:'100%'}}>
+                    <InputLabel shrink htmlFor="select-multiple-native">
+                      Channel Type
+                    </InputLabel>
                   <Select
                     labelId="demo-simple-select-standard-label"
                     id="demo-simple-select-standard"
                     value={ subscriptionData.subscriptions[0].channelType }
-                    label = "Services"
+                    label = "Channel Type"
                     onChange={e => {
                       setSubscriptionData({ ...subscriptionData ,  
                         subscriptions:  
@@ -1175,6 +1192,7 @@ function App() {
                     <MenuItem value='1'>Digital</MenuItem>
                     <MenuItem value='2'>Store</MenuItem>                    
                   </Select>
+                  </FormControl>
                 </Item>
                 <Item style={{width:'100%'}}>
                     <TextField label="Address" defaultValue={subscriptionData.subscriptions[0].address} style={{width:'100%'}} 
@@ -1214,6 +1232,10 @@ function App() {
                   <TextField label="Subscription Number Received With Add Subscription" value={serviceData.subscriptionServices[0].subscriptionNumber} style={{width:'100%'}} />
               </Item>
               <Item style={{width:'100%'}}>
+                <FormControl style={{width:'100%'}}>
+                    <InputLabel shrink htmlFor="select-multiple-native">
+                      Subscription
+                    </InputLabel>
                   <Select
                     labelId="demo-simple-select-standard-label"
                     id="demo-simple-select-standard"
@@ -1237,6 +1259,7 @@ function App() {
                     </MenuItem> */}
                     { subscriptions?.map((obj) => <MenuItem value={obj.subscriptionNumber}>{obj.phoneNumber}</MenuItem> ) }
                   </Select>
+                  </FormControl>
               </Item>
               {/* <Item style={{width:'100%'}}>
                   <TextField label="Services" value={serviceData.subscriptionServices[0].services} style={{width:'100%'}} 
@@ -1255,6 +1278,10 @@ function App() {
                     />
                 </Item> */}
                  <Item style={{width:'100%'}}>
+                  <FormControl style={{width:'100%'}}>
+                    <InputLabel shrink htmlFor="select-multiple-native">
+                      Services
+                    </InputLabel>
                   <Select
                     labelId="demo-simple-select-standard-label"
                     id="demo-simple-select-standard"
@@ -1282,6 +1309,7 @@ function App() {
                     <MenuItem value='-2147483639'>Non-Stop 250</MenuItem>
                     <MenuItem value='-2147483638'>International</MenuItem>
                   </Select>
+                  </FormControl>
               </Item>
                 <Item style={{width:'100%'}}>
                   <LoadingButton
